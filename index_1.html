@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Repair Shop</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-2:#F5F5F7; --card:#FFFFFF; --fill:#F5F5F7; --fill-2:#EBEBF0;
+  --text:#1D1D1F; --text-2:#6E6E73; --text-3:#86868B;
+  --sep:#D2D2D7; --sep-2:#E8E8ED;
+  --blue:#0066CC; --blue-solid:#0071E3; --green:#1D7F3C; --red:#C8102E; --orange:#B25000;
+  --blue-bg:#EDF4FD; --green-bg:#EAF6EE; --red-bg:#FCEDEF; --orange-bg:#FDF3E8;
+  --thumb:#FFFFFF; --r:18px; --r-sm:12px;
+  --shadow:0 4px 20px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-lg:0 18px 46px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.05);
+  --ease:cubic-bezier(.32,.72,0,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --bg-2:#101012; --card:#1C1C1E; --fill:#2C2C2E; --fill-2:#3A3A3C;
+    --thumb:#48484A;
+    --text:#F5F5F7; --text-2:#A1A1A6; --text-3:#8E8E93;
+    --sep:#38383A; --sep-2:#2C2C2E;
+    --blue:#2997FF; --blue-solid:#0A84FF; --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
+    --blue-bg:#0D2136; --green-bg:#0E2A18; --red-bg:#2E1113; --orange-bg:#2C1E06;
+    --shadow:0 4px 20px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
+    --shadow-lg:0 18px 46px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --bg-2:#101012; --card:#1C1C1E; --fill:#2C2C2E; --fill-2:#3A3A3C;
+    --thumb:#48484A;
+  --text:#F5F5F7; --text-2:#A1A1A6; --text-3:#8E8E93;
+  --sep:#38383A; --sep-2:#2C2C2E;
+  --blue:#2997FF; --blue-solid:#0A84FF; --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
+  --blue-bg:#0D2136; --green-bg:#0E2A18; --red-bg:#2E1113; --orange-bg:#2C1E06;
+  --shadow:0 4px 20px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
+  --shadow-lg:0 18px 46px rgba(0,0,0,.65), 0 2px 8px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0; -webkit-text-size-adjust:100%}
+html{min-height:100%}
+button{touch-action:manipulation}
+body{background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.5; letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+code,pre,.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace; letter-spacing:0}
+button,input,textarea{font-family:inherit; letter-spacing:inherit}
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.022em}
+
+.wrap{max-width:1120px; margin:0 auto; padding:34px 22px 60px; min-height:100vh;
+  min-height:100dvh; display:flex; flex-direction:column}
+.tabbody{margin-block:auto; width:100%}
+@media (max-width:640px){ .wrap{padding:18px 16px 40px} }
+
+.topline{display:flex; align-items:center; justify-content:space-between; gap:18px;
+  flex-wrap:wrap; margin-bottom:30px}
+.masthead{margin-bottom:30px}
+h1{font-size:44px; line-height:1.08; letter-spacing:-.03em}
+@media (max-width:640px){ h1{font-size:32px} }
+.lede{color:var(--text-2); max-width:62ch; font-size:18px; margin:14px 0 0; line-height:1.45}
+@media (max-width:640px){ .lede{font-size:16px} }
+
+.ghostpill{border:1px solid var(--sep); background:transparent; color:var(--text-2);
+  border-radius:980px; padding:7px 15px; font-size:13px; cursor:pointer; font-weight:500;
+  transition:background .2s var(--ease), color .2s var(--ease)}
+.ghostpill:hover{background:var(--fill); color:var(--text)}
+
+/* segmented control */
+.seg-wrap{margin:0}
+.segmented{display:inline-flex; position:relative; background:var(--fill); border-radius:11px; padding:3px;
+  gap:0}
+.segmented button{position:relative; z-index:1; appearance:none; border:none; background:none;
+  padding:8px 20px; font-size:14px; font-weight:500; color:var(--text-2); cursor:pointer;
+  border-radius:9px; transition:color .25s var(--ease)}
+.segmented button[aria-selected="true"]{color:var(--text); font-weight:600}
+.segmented .thumb{position:absolute; top:3px; bottom:3px; background:var(--thumb); border-radius:9px;
+  box-shadow:0 2px 6px rgba(0,0,0,.09), 0 0 0 .5px rgba(0,0,0,.04);
+  transition:left .34s var(--ease), width .34s var(--ease)}
+
+/* generic surfaces */
+.card{background:var(--card); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden}
+.card-h{padding:15px 20px 13px; border-bottom:1px solid var(--sep-2);
+  display:flex; align-items:center; justify-content:space-between; gap:12px}
+.card-h .t{font-size:15px; font-weight:600}
+.card-h .n{font-size:14px; color:var(--text-3); font-variant-numeric:tabular-nums}
+.card-b{padding:20px}
+
+.btn{appearance:none; border:none; border-radius:980px; padding:11px 22px; font-size:15px;
+  font-weight:500; cursor:pointer; background:var(--blue-solid); color:#fff;
+  transition:transform .18s var(--ease), opacity .2s var(--ease), background .2s var(--ease)}
+.btn:hover{opacity:.88}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35; cursor:default; transform:none}
+.btn.sub{background:var(--fill); color:var(--text)}
+.btn.sub:hover{background:var(--fill-2); opacity:1}
+.btn.go{background:var(--green); color:#fff}
+.btn.sm{padding:8px 16px; font-size:13.5px}
+.btn:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+
+input[type=text]{width:100%; font-size:15px; padding:11px 14px; border:1px solid var(--sep);
+  border-radius:var(--r-sm); background:var(--bg); color:var(--text); transition:border-color .2s}
+input[type=text]:focus{outline:none; border-color:var(--blue-solid); box-shadow:0 0 0 3px var(--blue-bg)}
+.mono-in{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:14px; letter-spacing:0}
+
+.hint{font-size:13px; color:var(--text-3); line-height:1.5}
+
+@keyframes riseIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+@keyframes fadeIn{from{opacity:0} to{opacity:1}}
+.rise{animation:riseIn .45s var(--ease) both}
+
+/* ---------- tab 1 ---------- */
+.layout{display:grid; grid-template-columns:296px 1fr; gap:24px; align-items:start}
+@media (max-width:920px){ .layout{grid-template-columns:1fr} }
+@media (max-width:640px){
+  h1{font-size:28px}
+  .dash{padding:14px}
+  .tile .val{font-size:21px}
+  .bars{height:80px}
+  .drow{font-size:13px; padding:10px 12px}
+  .inrow input{flex:1 1 100%}
+  .inrow .btn{flex:1 1 auto}
+  .topline{margin-bottom:20px}
+  .segmented button{padding:8px 14px; font-size:13.5px}
+}
+
+.faults{list-style:none; margin:0; padding:6px}
+.fault{display:flex; gap:12px; align-items:center; width:100%; text-align:left; border:none;
+  background:none; color:var(--text); padding:11px 12px; border-radius:var(--r-sm); cursor:pointer;
+  transition:background .2s var(--ease)}
+.fault:hover{background:var(--fill)}
+.fault[aria-pressed="true"]{background:var(--blue-bg)}
+.fault .num{width:22px; height:22px; flex:none; border-radius:50%; background:var(--fill-2);
+  color:var(--text-2); font-size:11.5px; font-weight:600; display:flex; align-items:center;
+  justify-content:center; font-variant-numeric:tabular-nums; transition:all .25s var(--ease)}
+.fault[aria-pressed="true"] .num{background:var(--blue-solid); color:#fff}
+.fault.done .num{background:var(--green); color:#fff}
+.fault .txt{min-width:0}
+.fault .lab{font-size:14px; line-height:1.3; display:block}
+.fault .kind{font-size:12px; color:var(--text-3); display:block; margin-top:2px}
+.fault:focus-visible{outline:2px solid var(--blue); outline-offset:-2px}
+
+.bar{height:4px; border-radius:99px; background:var(--fill-2); overflow:hidden}
+.bar i{display:block; height:100%; background:var(--green); border-radius:99px;
+  transition:width .5s var(--ease)}
+
+.screen{background:var(--card); border-radius:var(--r); box-shadow:var(--shadow-lg); overflow:hidden}
+.chrome{display:flex; align-items:center; gap:7px; padding:12px 18px; border-bottom:1px solid var(--sep-2)}
+.tl{width:11px;height:11px;border-radius:50%;background:var(--sep);flex:none}
+.fname{font-size:13px; color:var(--text-3); margin-left:8px; font-family:ui-monospace,Menlo,monospace;
+  letter-spacing:0; transition:color .3s}
+.fname.bad{color:var(--red)}
+
+.dash{padding:24px}
+@media (max-width:640px){ .dash{padding:18px} }
+.dash-h{display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  margin-bottom:20px}
+.shopname{font-size:24px; font-weight:600; letter-spacing:-.022em; transition:color .3s}
+.shopname.bad{color:var(--red)} .shopname.off{color:var(--text-3)}
+.week{font-size:13.5px; color:var(--text-3)}
+
+.tiles{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px}
+@media (max-width:820px){ .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.tile{background:var(--fill); border-radius:var(--r-sm); padding:15px 16px;
+  transition:background .3s var(--ease), opacity .3s var(--ease)}
+.tile.lie{background:var(--red-bg)}
+.tile.dead{opacity:.32}
+.tile .lab{font-size:13px; color:var(--text-2)}
+.tile .val{font-size:24px; font-weight:600; letter-spacing:-.025em; margin-top:4px;
+  font-variant-numeric:tabular-nums; word-break:break-word; line-height:1.15}
+.tile.lie .val{color:var(--red)}
+.tile .sub{font-size:12.5px; color:var(--text-3); margin-top:3px}
+.tile.lie .sub{color:var(--red)}
+
+.chartbox{margin-top:12px; background:var(--fill); border-radius:var(--r-sm); padding:16px 18px 12px;
+  transition:opacity .3s var(--ease)}
+.chartbox.dead{opacity:.32}
+.chartbox .ct{font-size:13px; color:var(--text-2); margin-bottom:14px}
+.bars{display:flex; align-items:flex-end; gap:12px; height:104px}
+.bcol{flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:6px;
+  height:100%}
+.bcol .b{width:100%; background:var(--blue-solid); border-radius:6px 6px 2px 2px; min-height:3px;
+  transition:height .45s var(--ease), background .3s}
+.bcol.dead .b{background:var(--sep)}
+.bcol .n{font-size:11.5px; color:var(--text-3); font-variant-numeric:tabular-nums}
+.bcol .d{font-size:12px; color:var(--text-2)}
+
+.rowbox{margin-top:12px; background:var(--fill); border-radius:var(--r-sm); overflow:hidden}
+.drow{display:flex; justify-content:space-between; gap:12px; padding:12px 16px; font-size:14px;
+  border-bottom:1px solid var(--sep-2); transition:background .3s var(--ease), opacity .3s var(--ease)}
+.drow:last-child{border-bottom:none}
+.drow .k{color:var(--text-2)}
+.drow .v{font-variant-numeric:tabular-nums; font-weight:500}
+.drow.lie{background:var(--red-bg)}
+.drow.lie .k,.drow.lie .v{color:var(--red)}
+.drow.dead{opacity:.32}
+
+.banner{margin-top:16px; border-radius:var(--r-sm); padding:14px 16px; animation:riseIn .4s var(--ease) both}
+.banner.bad{background:var(--red-bg)}
+.banner.ok{background:var(--green-bg)}
+.banner.warn{background:var(--orange-bg)}
+.banner.warn .h{color:var(--orange)}
+.banner.warn pre{color:var(--orange)}
+.banner .h{font-size:13px; font-weight:600; color:var(--red)}
+.banner pre{margin:7px 0 0; font-size:12.5px; color:var(--red); white-space:pre-wrap;
+  word-break:break-word; line-height:1.5}
+.banner.ok p{margin:0; font-size:14px; color:var(--text-2)}
+
+.explain{margin-top:24px; display:grid; gap:14px}
+.srcbox .l{font-size:13px; color:var(--text-2); margin-bottom:8px}
+pre.code{margin:0; background:var(--fill); border-radius:var(--r-sm); padding:16px 18px;
+  font-size:13.5px; line-height:1.65; overflow-x:auto; white-space:pre}
+.note{border-radius:var(--r-sm); padding:16px 18px}
+.note .h{font-size:13px; font-weight:600; margin-bottom:5px}
+.note p{margin:0; font-size:15px; line-height:1.55}
+.note.breaks{background:var(--red-bg)} .note.breaks .h{color:var(--red)}
+.note.why{background:var(--orange-bg)} .note.why .h{color:var(--orange)}
+.note.fix{background:var(--green-bg)} .note.fix .h{color:var(--green)}
+
+.repair{background:var(--fill); border-radius:var(--r); padding:20px}
+.repair .btn.sub{background:var(--card)}
+.repair .btn.sub:hover{background:var(--fill-2)}
+.repair .l{font-size:14px; font-weight:600; margin-bottom:10px; display:block}
+.inrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.inrow input{flex:1 1 280px}
+.verdict{margin-top:11px; font-size:14px; animation:fadeIn .3s both}
+.verdict.no{color:var(--red)}
+.verdict.yes{color:var(--green); font-weight:500}
+.showme{margin-top:11px; font-size:14px; color:var(--text-2)}
+.showme code{background:var(--card); border-radius:7px; padding:3px 8px; font-size:13px}
+.blank{padding:44px 20px; text-align:center; color:var(--text-3); font-size:15px}
+
+/* ---------- tab 2 ---------- */
+.deckwrap{display:grid; grid-template-columns:1fr 268px; gap:28px; align-items:start}
+@media (max-width:920px){ .deckwrap{grid-template-columns:1fr} }
+
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px}
+@media (max-width:760px){
+  .chips{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none;
+    margin:0 -16px 16px; padding:2px 16px 6px; scroll-snap-type:x proximity}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none; scroll-snap-align:start}
+}
+.chip{appearance:none; border:1px solid var(--sep); background:transparent; color:var(--text-2);
+  border-radius:980px; padding:7px 15px; font-size:13.5px; cursor:pointer; font-weight:500;
+  transition:all .22s var(--ease)}
+.chip:hover{background:var(--fill); color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--text); color:var(--bg); border-color:var(--text)}
+
+.stage{position:relative; perspective:1800px}
+.stack{position:absolute; inset:0; border-radius:22px; background:#14663A; box-shadow:var(--shadow)}
+.stack.s1{transform:translateY(11px) scale(.965); opacity:.55}
+.stack.s2{transform:translateY(22px) scale(.93); opacity:.3}
+
+.swap{position:relative; width:100%}
+.flip{display:grid; width:100%; min-height:432px; touch-action:pan-y; transform-style:preserve-3d;
+  transition:transform .62s var(--ease); cursor:pointer}
+.flip.on{transform:rotateY(180deg)}
+.face{grid-area:1/1; position:relative; backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  background:var(--card); border-radius:22px; box-shadow:var(--shadow-lg);
+  display:flex; flex-direction:column}
+.face > *{flex:none}
+.face.back{transform:rotateY(180deg) translateZ(0)}
+
+.front{align-items:center; justify-content:center; text-align:center; padding:40px 32px; gap:22px;
+  background:linear-gradient(158deg, #23955A 0%, #14663A 65%); color:#FFFFFF;
+  box-shadow:0 22px 50px rgba(15,70,40,.26), 0 2px 8px rgba(0,0,0,.10)}
+.front .grp{color:rgba(255,255,255,.80)}
+.front .tap{color:rgba(255,255,255,.62)}
+.front .badge{background:rgba(255,255,255,.17); color:#FFFFFF}
+.grp{font-size:13px; font-weight:600; color:var(--blue)}
+.term{font-size:46px; font-weight:600; letter-spacing:-.03em; line-height:1.08; word-break:break-word}
+@media (max-width:640px){ .term{font-size:34px} }
+.term .mono{font-size:.88em}
+.tap{font-size:13.5px; color:var(--text-3)}
+.badge{display:inline-block; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  letter-spacing:0; font-size:17px; background:var(--fill); color:var(--text-2);
+  border-radius:10px; padding:7px 15px; white-space:pre}
+.back .badge{font-size:14px; padding:5px 11px; margin-top:6px}
+
+.back{padding:30px 32px 32px; gap:0}
+@media (max-width:640px){
+  .back,.front{padding:24px 20px}
+  .flip{min-height:360px}
+  .back .term{font-size:24px}
+  .back .defn{font-size:16px; margin:12px 0 16px}
+  .back pre.code{font-size:12.5px; padding:13px 14px}
+  .like{font-size:14px}
+  .stack.s1{transform:translateY(8px) scale(.97)}
+  .stack.s2{transform:translateY(16px) scale(.945)}
+}
+.back .term{font-size:29px; text-align:left}
+.back .defn{font-size:17.5px; line-height:1.5; color:var(--text); margin:14px 0 20px; max-width:56ch}
+.back pre.code{background:var(--fill); font-size:13.5px; line-height:1.75}
+.res{color:var(--green)}
+.errline{color:var(--red)}
+.like{margin-top:20px; padding-top:18px; border-top:1px solid var(--sep-2); font-size:15px;
+  color:var(--text-2); line-height:1.55}
+.like b{color:var(--text); font-weight:600}
+
+@keyframes inFromRight{from{opacity:0; transform:translateX(34px) scale(.97)} to{opacity:1; transform:none}}
+@keyframes inFromLeft{from{opacity:0; transform:translateX(-34px) scale(.97)} to{opacity:1; transform:none}}
+@keyframes outLeft{to{opacity:0; transform:translateX(-120px) rotate(-7deg) scale(.9)}}
+@keyframes outRight{to{opacity:0; transform:translateX(120px) rotate(7deg) scale(.9)}}
+.enter{animation:inFromRight .42s var(--ease) both}
+.enterL{animation:inFromLeft .42s var(--ease) both}
+.leaveL{animation:outLeft .38s var(--ease) both}
+.leaveR{animation:outRight .38s var(--ease) both}
+
+.deckrow{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:16px; align-items:center}
+@media (max-width:640px){ .deckrow{grid-template-columns:minmax(0,1fr); gap:14px} }
+.arrow{appearance:none; border:1px solid var(--sep); background:var(--card); color:var(--text);
+  width:46px; height:46px; border-radius:50%; cursor:pointer; font-size:19px; line-height:1;
+  display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
+  transition:transform .18s var(--ease), background .2s var(--ease)}
+.arrow:hover{background:var(--fill)}
+.arrow:active{transform:scale(.92)}
+.arrow:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+@media (max-width:640px){
+  .arrowbar{display:flex; gap:12px; justify-content:center}
+  .arrow{width:44px; height:44px}
+}
+.deckctrl{display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; align-items:center; justify-content:center}
+.mobonly{display:none}
+@media (max-width:640px){ .deskonly{display:none} .mobonly{display:flex} }
+.keyhint{font-size:12.5px; color:var(--text-3); margin-top:26px}
+.kbd{display:inline-block; background:var(--fill); border-radius:5px; padding:1px 6px; font-size:11.5px;
+  font-family:ui-monospace,Menlo,monospace; border:1px solid var(--sep-2)}
+
+.ringwrap{display:flex; align-items:center; gap:16px}
+.ring{transform:rotate(-90deg)}
+.ring circle{fill:none; stroke-width:7; stroke-linecap:round}
+.ring .track{stroke:var(--fill-2)}
+.ring .fill{stroke:var(--green); transition:stroke-dashoffset .55s var(--ease)}
+.ringnum{font-size:26px; font-weight:600; letter-spacing:-.025em; font-variant-numeric:tabular-nums}
+.ringsub{font-size:13px; color:var(--text-3)}
+
+
+.done{align-items:center; justify-content:center; text-align:center; padding:48px 32px; gap:18px}
+
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script id="deckdata" type="application/json">[{"g":"Variables & types","t":"Variable","d":"A name that points at a value. Point it somewhere else and the old value simply stops being named.","lines":[{"c":"bags = 26"},{"c":"bags = 27"},{"c":"bags","r":"27"}],"like":"A labelled shelf. What sits on it can be swapped; the label stays."},{"g":"Variables & types","t":"Assignment","d":"A single = stores the value on the right in the name on the left. It is an instruction, not a claim that two things are equal.","lines":[{"c":"revenue = 368.50"},{"c":"revenue","r":"368.5"}],"like":"Writing on the label, not comparing two labels.","k":"="},{"g":"Variables & types","t":"Naming rules","d":"Names may use letters, digits and underscores, must not start with a digit, and are case sensitive. bags and Bags are two different names.","lines":[{"c":"bags_sold = 26"},{"c":"Bags_Sold = 99"},{"c":"bags_sold","r":"26"}],"like":"Two staff members called Ann and ANN. Same sound, different people."},{"g":"Variables & types","t":"Checking a type","d":"Asks what kind of value something is. Worth running whenever a line behaves oddly.","lines":[{"c":"type(26)","r":"<class 'int'>"},{"c":"type(368.50)","r":"<class 'float'>"},{"c":"type(\"26\")","r":"<class 'str'>"},{"c":"type(True)","r":"<class 'bool'>"}],"like":"Checking whether the thing in your hand is a receipt or a banknote.","k":"type()"},{"g":"Variables & types","t":"Integer","d":"A whole number. No decimal part at all.","lines":[{"c":"26","r":"26"},{"c":"type(8)","r":"<class 'int'>"}],"like":"The tally of chairs in a room. There is never half of one.","k":"int"},{"g":"Variables & types","t":"Float","d":"A number with a decimal part. Money and measurements are almost always floats.","lines":[{"c":"368.50","r":"368.5"},{"c":"type(46.06)","r":"<class 'float'>"}],"like":"What the scale reads when you weigh a bag of coffee.","k":"float"},{"g":"Variables & types","t":"String","d":"Text. Anything inside quotation marks, even when it looks like a number.","lines":[{"c":"\"Redbud Roasters\"","r":"'Redbud Roasters'"},{"c":"type(\"12.50\")","r":"<class 'str'>"}],"like":"Anything you would put in a spreadsheet cell and never do arithmetic on.","k":"str"},{"g":"Variables & types","t":"Boolean","d":"One of exactly two values, True and False. No third option. Written with a capital letter.","lines":[{"c":"26 > 20","r":"True"},{"c":"type(True)","r":"<class 'bool'>"}],"like":"The answer to 'is the shop open?'","k":"bool"},{"g":"Operators","t":"Arithmetic","d":"Add, subtract, multiply, divide. Division always gives a float, even when it comes out even.","lines":[{"c":"368.50 + 41.00","r":"409.5"},{"c":"12.50 * 3","r":"37.5"},{"c":"368.50 / 8","r":"46.0625"},{"c":"40 / 8","r":"5.0"}],"like":"The four keys on any calculator.","k":"+  -  *  /"},{"g":"Operators","t":"Floor division","d":"Divides and throws away everything after the decimal point. It rounds down, never to nearest.","lines":[{"c":"26 // 4","r":"6"},{"c":"26 / 4","r":"6.5"}],"like":"How many full boxes of four you can fill, ignoring the leftovers.","k":"//"},{"g":"Operators","t":"Modulo","d":"The remainder after division. Most often used to ask 'does this divide evenly?'","lines":[{"c":"26 % 4","r":"2"},{"c":"26 % 2","r":"0"},{"c":"26 % 2 == 0","r":"True"}],"like":"The leftovers after you have filled every full box.","k":"%"},{"g":"Operators","t":"Exponent","d":"Raises to a power. Two stars, not the ^ symbol you would write by hand.","lines":[{"c":"2 ** 3","r":"8"},{"c":"1.05 ** 2","r":"1.1025"}],"like":"Compound growth: this much, that many times over.","k":"**"},{"g":"Operators","t":"Order of operations","d":"Python does ** first, then * / // %, then + -. Brackets override everything, and they cost nothing.","lines":[{"c":"2 + 3 * 4","r":"14"},{"c":"(2 + 3) * 4","r":"20"}],"like":"The same rules you were taught in school, and the same reason to use brackets."},{"g":"Operators","t":"Augmented assignment","d":"Shorthand for 'take the current value, change it, put it back under the same name'.","lines":[{"c":"bags = 26"},{"c":"bags += 4"},{"c":"bags","r":"30"}],"like":"Topping up a running total rather than starting a new one.","k":"+="},{"g":"Operators","t":"One equals sign or two","d":"One equals sign stores a value. Two equals signs ask a question and give back True or False.","lines":[{"c":"bags = 26"},{"c":"bags == 26","r":"True"},{"c":"bags == 30","r":"False"}],"like":"Writing on the label versus reading two labels and asking if they match.","k":"=    =="},{"g":"Operators","t":"Comparison operators","d":"==  !=  <  <=  >  >=  compare two values and produce a boolean.","lines":[{"c":"26 >= 20","r":"True"},{"c":"12.50 != 14.00","r":"True"},{"c":"\"House\" == \"house\"","r":"False"}],"like":"What you write between two prices to claim one is bigger.","k":"==  !=  <  <=  >  >="},{"g":"Operators","t":"Combining conditions","d":"Join conditions. and needs both sides true; or needs one; not flips the answer.","lines":[{"c":"bags = 26"},{"c":"revenue = 368.50"},{"c":"bags > 20 and revenue > 300","r":"True"},{"c":"bags > 30 or revenue > 300","r":"True"},{"c":"not bags > 30","r":"True"}],"like":"Two conditions on a discount: both must hold, or just one, or neither.","k":"and  or  not"},{"g":"Operators","t":"Membership","d":"Asks whether something appears inside a string, list, tuple or dictionary. Gives back True or False.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"\"House\" in blends","r":"True"},{"c":"\"Mocha\" in blends","r":"False"},{"c":"\"bud\" in \"Redbud\"","r":"True"}],"like":"Scanning a guest list for a name before letting somebody in.","k":"in"},{"g":"Converting types","t":"Type conversion","d":"Turning a value of one kind into another, deliberately. Data from files and forms nearly always arrives as text.","lines":[{"c":"int(\"26\")","r":"26"},{"c":"float(\"12.50\")","r":"12.5"},{"c":"str(26)","r":"'26'"}],"like":"Taking the amount written on a paper cheque and handing it to a calculator."},{"g":"Converting types","t":"Making a whole number","d":"Makes a whole number. It will not read a decimal point out of text, and on a float it chops rather than rounds.","lines":[{"c":"int(\"26\")","r":"26"},{"c":"int(26.9)","r":"26"}],"like":"Cutting the fraction off, not rounding it.","k":"int()"},{"g":"Converting types","t":"Making a decimal","d":"Makes a decimal number. Any currency symbol or comma has to come out of the text first.","lines":[{"c":"float(\"12.50\")","r":"12.5"},{"c":"float(\"$368.50\".replace(\"$\", \"\"))","r":"368.5"}],"like":"Stripping the symbol off the price tag before you add it up.","k":"float()"},{"g":"Converting types","t":"Making text","d":"Makes text out of a number, which is what you need before joining it to other text with +.","lines":[{"c":"str(26)","r":"'26'"},{"c":"\"Bags: \" + str(26)","r":"'Bags: 26'"}],"like":"Writing the number out in words on the form.","k":"str()"},{"g":"Converting types","t":"Text that looks numeric","d":"Quotation marks change what every operator does. The same characters behave completely differently.","lines":[{"c":"\"12.50\" * 3","r":"'12.5012.5012.50'"},{"c":"float(\"12.50\") * 3","r":"37.5"}],"like":"Photocopying the price tag three times versus buying three bags."},{"g":"Strings","t":"Joining text","d":"Joins text to text. It will not join text to a number — convert first, or use an f-string.","lines":[{"c":"\"Redbud\" + \" \" + \"Roasters\"","r":"'Redbud Roasters'"}],"like":"Gluing two strips of paper end to end.","k":"+"},{"g":"Strings","t":"Dropping values into text","d":"An f before the quotes lets you drop values straight into text inside curly brackets. No conversion needed.","lines":[{"c":"bags = 26"},{"c":"revenue = 368.50"},{"c":"f\"{bags} bags for ${revenue}\"","r":"'26 bags for $368.5'"}],"like":"A form letter with blanks that fill themselves in.","k":"f\"{ }\""},{"g":"Strings","t":"Length of text","d":"How many characters the text holds, spaces included.","lines":[{"c":"len(\"House\")","r":"5"},{"c":"len(\"Redbud Roasters\")","r":"15"}],"like":"Counting the letters on a sign to see if it fits the board.","k":"len()"},{"g":"Strings","t":"Indexing text","d":"Square brackets take one character by position, counted from zero.","lines":[{"c":"code = \"RB-1041\""},{"c":"code[0]","r":"'R'"},{"c":"code[3]","r":"'1'"}],"like":"The seat you are in, counted from the front row, where the front row is row zero.","k":"[0]"},{"g":"Strings","t":"Counting from the end","d":"Counting backwards from the end. -1 is the last character, -2 the one before it.","lines":[{"c":"code = \"RB-1041\""},{"c":"code[-1]","r":"'1'"},{"c":"code[-2]","r":"'4'"}],"like":"Third from the back of the queue.","k":"[-1]"},{"g":"Strings","t":"Slicing","d":"Takes a run of characters. It starts at a and stops before b, so the end position is not included.","lines":[{"c":"code = \"RB-1041\""},{"c":"code[0:2]","r":"'RB'"},{"c":"code[3:7]","r":"'1041'"},{"c":"code[3:]","r":"'1041'"}],"like":"Tearing out pages 3 to 7 and leaving the rest on the desk.","k":"[a:b]"},{"g":"Strings","t":"Changing case","d":"Return a new piece of text in one case. Useful for comparing entries that people typed by hand.","lines":[{"c":"\"House\".upper()","r":"'HOUSE'"},{"c":"\"HOUSE\".lower()","r":"'house'"},{"c":"\"House\".lower() == \"house\"","r":"True"}],"like":"Rewriting every entry in the same handwriting before you compare them.","k":".upper()   .lower()"},{"g":"Strings","t":"Title case","d":"Capitalises the first letter of every word. Good for names that arrived in lower case.","lines":[{"c":"\"redbud roasters\".title()","r":"'Redbud Roasters'"}],"like":"Tidying a name badge that was typed in a hurry.","k":".title()"},{"g":"Strings","t":"Trimming spaces","d":"Removes spaces from both ends, leaving the middle alone. Invisible spaces are a constant source of failed matches.","lines":[{"c":"\"  House  \".strip()","r":"'House'"},{"c":"\"  House  \" == \"House\"","r":"False"},{"c":"\"  House  \".strip() == \"House\"","r":"True"}],"like":"Trimming the blank margin off a printout.","k":".strip()"},{"g":"Strings","t":"Find and replace","d":"Swaps every occurrence of one piece of text for another and gives back a new string.","lines":[{"c":"\"$368.50\".replace(\"$\", \"\")","r":"'368.50'"},{"c":"\"1,250\".replace(\",\", \"\")","r":"'1250'"}],"like":"Find and replace in a word processor.","k":".replace()"},{"g":"Strings","t":"Splitting text","d":"Cuts text into a list wherever the separator appears. With no separator given, it splits on spaces.","lines":[{"c":"\"House,Sumatra,Decaf\".split(\",\")","r":"['House', 'Sumatra', 'Decaf']"},{"c":"\"Redbud Roasters\".split()","r":"['Redbud', 'Roasters']"}],"like":"Cutting a receipt along its dotted lines.","k":".split()"},{"g":"Strings","t":"Joining a list into text","d":"The opposite of split. The separator goes in front, the list of pieces in the brackets.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"\", \".join(blends)","r":"'House, Sumatra, Decaf'"}],"like":"Taping the cut-up strips back into one line.","k":".join()"},{"g":"Strings","t":"Finding a position","d":"Gives the position of the first match, or -1 when there is no match. That -1 is not a position.","lines":[{"c":"\"Redbud\".find(\"bud\")","r":"3"},{"c":"\"Redbud\".find(\"zzz\")","r":"-1"}],"like":"A search that answers 'page 4' or 'not in this book'.","k":".find()"},{"g":"Strings","t":"Counting occurrences","d":"How many times a piece of text appears inside another.","lines":[{"c":"\"Mississippi\".count(\"ss\")","r":"2"},{"c":"\"House, Sumatra, Decaf\".count(\",\")","r":"2"}],"like":"Tallying how often a word shows up in a report.","k":".count()"},{"g":"Strings","t":"Begins or ends with","d":"Ask whether text begins or ends with something. Both give back a boolean.","lines":[{"c":"\"RB-1041\".startswith(\"RB\")","r":"True"},{"c":"\"report.csv\".endswith(\".csv\")","r":"True"}],"like":"Sorting post by the first two letters of the postcode.","k":".startswith()   .endswith()"},{"g":"Strings","t":"Strings cannot be changed","d":"You can read any character, but you cannot overwrite one. Every change makes a new string.","lines":[{"c":"name = \"redbud\""},{"c":"name[0] = \"R\"","e":"TypeError: 'str' object does not support item assignment"},{"c":"name.title()","r":"'Redbud'"}],"like":"A tattoo. You can get another one; you cannot edit the one you have."},{"g":"Strings","t":"Quotes inside quotes","d":"Single and double quotes both make strings, so you can nest one kind inside the other.","lines":[{"c":"\"Nadia's shop\"","r":"\"Nadia's shop\""},{"c":"'He said \"yes\"'","r":"'He said \"yes\"'"}],"like":"Brackets inside brackets — use a different shape for the inner pair."},{"g":"Lists","t":"List","d":"An ordered container you can change. Square brackets, commas between the items.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"blends","r":"['House', 'Sumatra', 'Decaf']"},{"c":"len(blends)","r":"3"}],"like":"A shopping list. Order matters and you can cross things out.","k":"[ ]"},{"g":"Lists","t":"Indexing a list","d":"Same as text: square brackets, counting from zero, negatives from the end.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"blends[0]","r":"'House'"},{"c":"blends[-1]","r":"'Decaf'"}],"like":"Picking the third item down the page.","k":"[0]"},{"g":"Lists","t":"Slicing a list","d":"Takes a run of items as a new list. The end position is not included.","lines":[{"c":"sales = [62.50, 41.00, 88.75, 95.25, 81.00]"},{"c":"sales[0:3]","r":"[62.5, 41.0, 88.75]"},{"c":"sales[3:]","r":"[95.25, 81.0]"}],"like":"Photocopying only Monday to Wednesday off the week's sheet.","k":"[a:b]"},{"g":"Lists","t":"Adding to the end","d":"Adds one item to the end. It changes the list in place and hands nothing back.","lines":[{"c":"blends = [\"House\", \"Sumatra\"]"},{"c":"blends.append(\"Decaf\")"},{"c":"blends","r":"['House', 'Sumatra', 'Decaf']"}],"like":"Writing another line at the bottom of the list.","k":".append()"},{"g":"Lists","t":"Inserting at a position","d":"Puts an item at a chosen position and shifts everything after it along.","lines":[{"c":"blends = [\"House\", \"Decaf\"]"},{"c":"blends.insert(1, \"Sumatra\")"},{"c":"blends","r":"['House', 'Sumatra', 'Decaf']"}],"like":"Squeezing a line in between two others.","k":".insert()"},{"g":"Lists","t":"Removing by value","d":"Deletes the first matching item. If it is not there, the line raises rather than doing nothing.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"blends.remove(\"Sumatra\")"},{"c":"blends","r":"['House', 'Decaf']"}],"like":"Crossing a named item off, and complaining if it was never on the list.","k":".remove()"},{"g":"Lists","t":"Removing by position","d":"Removes an item by position and hands it back to you. With no position it takes the last one.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"blends.pop()","r":"'Decaf'"},{"c":"blends","r":"['House', 'Sumatra']"}],"like":"Taking the top sheet off a pile and keeping it in your hand.","k":".pop()"},{"g":"Lists","t":"sort or sorted","d":"sort() rearranges the list in place and returns nothing. sorted() leaves the original alone and hands back a new list.","lines":[{"c":"sales = [62.50, 41.00, 88.75]"},{"c":"sorted(sales, reverse=True)","r":"[88.75, 62.5, 41.0]"},{"c":"sales","r":"[62.5, 41.0, 88.75]"},{"c":"sales.sort()","r":"None"},{"c":"sales","r":"[41.0, 62.5, 88.75]"}],"like":"Tidying the shelf itself, versus being handed a tidy copy.","k":".sort()    sorted()"},{"g":"Lists","t":"Where, and how many","d":"Where an item sits, and how many times it appears.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"House\"]"},{"c":"blends.index(\"Sumatra\")","r":"1"},{"c":"blends.count(\"House\")","r":"2"}],"like":"Which row it is on, and how many rows mention it.","k":".index()   .count()"},{"g":"Lists","t":"Totals and extremes","d":"Total, smallest and largest. They work on a list of numbers, not on a list of text you meant to be numbers.","lines":[{"c":"sales = [62.50, 41.00, 88.75, 95.25, 81.00]"},{"c":"sum(sales)","r":"368.5"},{"c":"min(sales)","r":"41.0"},{"c":"max(sales)","r":"95.25"},{"c":"round(sum(sales) / 5, 2)","r":"73.7"}],"like":"The totals row at the bottom of the sheet.","k":"sum()  min()  max()"},{"g":"Lists","t":"Copying a list","d":"A plain = makes a second name for the same list, not a second list. Use .copy() when you want a real spare.","lines":[{"c":"sales = [3, 1, 2]"},{"c":"backup = sales"},{"c":"sales.sort()"},{"c":"backup","r":"[1, 2, 3]"},{"c":"sales = [3, 1, 2]"},{"c":"backup = sales.copy()"},{"c":"sales.sort()"},{"c":"backup","r":"[3, 1, 2]"}],"like":"A nickname for one person, versus an actual twin.","k":".copy()"},{"g":"Lists","t":"Sorting text that holds numbers","d":"Text sorts alphabetically, so '100' lands before '9'. Convert before you sort, or every ranking is wrong.","lines":[{"c":"sorted([\"9\", \"10\", \"100\"])","r":"['10', '100', '9']"},{"c":"sorted([9, 10, 100])","r":"[9, 10, 100]"}],"like":"Filing 100 before 9 because it starts with a 1."},{"g":"Tuples","t":"Tuple","d":"An ordered container that cannot be changed once it exists. Round brackets instead of square.","lines":[{"c":"order = (\"RB-1041\", \"House\", 3)"},{"c":"order","r":"('RB-1041', 'House', 3)"},{"c":"order[1]","r":"'House'"}],"like":"A pair of coordinates printed on a map. Once printed, nothing moves.","k":"( )"},{"g":"Tuples","t":"Tuples cannot be changed","d":"No item can be replaced, added or removed after the tuple is made. That is the whole point of choosing one.","lines":[{"c":"order = (\"RB-1041\", \"House\", 3)"},{"c":"order[1] = \"Decaf\"","e":"TypeError: 'tuple' object does not support item assignment"}],"like":"A printed receipt. To change it you issue a new one."},{"g":"Tuples","t":"A tuple has two methods","d":".count() and .index(). Nothing else — there is no .append(), and there never was.","lines":[{"c":"order = (\"House\", 3, \"House\")"},{"c":"order.count(\"House\")","r":"2"},{"c":"order.index(3)","r":"1"},{"c":"order.append(1)","e":"AttributeError: 'tuple' object has no attribute 'append'"}],"like":"A sealed envelope you may read but not write in.","k":".count()   .index()"},{"g":"Tuples","t":"Unpacking","d":"Hand a tuple to several names at once and each item lands in order.","lines":[{"c":"order = (\"RB-1041\", \"House\", 3)"},{"c":"code, blend, bags = order"},{"c":"blend","r":"'House'"},{"c":"bags","r":"3"}],"like":"Emptying a labelled envelope into the right three trays."},{"g":"Tuples","t":"Why choose a tuple","d":"Because it cannot change. A record that should stay fixed — one order, one pair of coordinates — is safer as a tuple than a list.","lines":[{"c":"record = (\"RB-1041\", \"House\", 3)"},{"c":"basket = [\"House\", \"Sumatra\"]"},{"c":"type(record)","r":"<class 'tuple'>"},{"c":"type(basket)","r":"<class 'list'>"}],"like":"Printed on the receipt versus written on the notepad."},{"g":"Dictionaries","t":"Dictionary","d":"Pairs of keys and values in curly brackets. You hand it a key, it hands back the value.","lines":[{"c":"price = {\"House\": 12.50, \"Sumatra\": 14.00}"},{"c":"price","r":"{'House': 12.5, 'Sumatra': 14.0}"},{"c":"price[\"House\"]","r":"12.5"}],"like":"A staff directory: give it a surname, get back an extension.","k":"{ }"},{"g":"Dictionaries","t":"Key","d":"The label you look a value up by. Keys must be unique, and in this course they are text.","lines":[{"c":"price = {\"House\": 12.50, \"Sumatra\": 14.00}"},{"c":"list(price.keys())","r":"['House', 'Sumatra']"}],"like":"What you type into the directory's search box."},{"g":"Dictionaries","t":"Value","d":"What the key gives back. Values may repeat; keys may not.","lines":[{"c":"price = {\"House\": 12.50, \"Sumatra\": 14.00}"},{"c":"list(price.values())","r":"[12.5, 14.0]"},{"c":"price[\"Sumatra\"]","r":"14.0"}],"like":"The extension the directory reads out."},{"g":"Dictionaries","t":"Adding and updating a key","d":"Assign to a key. If it is new the pair is added; if it already exists the old value is replaced without warning.","lines":[{"c":"price = {\"House\": 12.50}"},{"c":"price[\"Decaf\"] = 13.00"},{"c":"price[\"House\"] = 13.25"},{"c":"price","r":"{'House': 13.25, 'Decaf': 13.0}"}],"like":"Writing a new line in the directory, or writing over an old one."},{"g":"Dictionaries","t":"Looking up safely","d":"Looks a key up without raising. Give it a fallback and a missing key returns that instead of stopping the program.","lines":[{"c":"price = {\"House\": 12.50}"},{"c":"price.get(\"House\")","r":"12.5"},{"c":"price.get(\"Mocha\", 0.0)","r":"0.0"}],"like":"A search that returns 'nothing found' instead of shouting.","k":".get()"},{"g":"Dictionaries","t":"The three views","d":"The labels, the contents, and the pairs.","lines":[{"c":"price = {\"House\": 12.50, \"Decaf\": 13.00}"},{"c":"list(price.keys())","r":"['House', 'Decaf']"},{"c":"list(price.values())","r":"[12.5, 13.0]"},{"c":"list(price.items())","r":"[('House', 12.5), ('Decaf', 13.0)]"}],"like":"The index, the entries, and the whole directory.","k":".keys()   .values()   .items()"},{"g":"Dictionaries","t":"in checks the keys","d":"Checks the keys, never the values. Asking whether 12.50 is 'in' a price list gives False.","lines":[{"c":"price = {\"House\": 12.50}"},{"c":"\"House\" in price","r":"True"},{"c":"12.50 in price","r":"False"},{"c":"12.50 in price.values()","r":"True"}],"like":"Searching a phone book by name, not by number.","k":"in"},{"g":"Dictionaries","t":"How many pairs","d":"How many pairs it holds.","lines":[{"c":"price = {\"House\": 12.50, \"Sumatra\": 14.00, \"Decaf\": 13.00}"},{"c":"len(price)","r":"3"}],"like":"How many entries in the directory.","k":"len()"},{"g":"Dictionaries","t":"Removing a key","d":"Removes a key and hands back its value.","lines":[{"c":"price = {\"House\": 12.50, \"Decaf\": 13.00}"},{"c":"price.pop(\"Decaf\")","r":"13.0"},{"c":"price","r":"{'House': 12.5}"}],"like":"Tearing an entry out and keeping the slip.","k":".pop()"},{"g":"Arrays","t":"Numpy array","d":"A container built for numbers. Made with np.array() from a list, and every item must be the same type.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75, 95.25, 81.00])"},{"c":"sales","r":"array([62.5 , 41.  , 88.75, 95.25, 81.  ])"}],"like":"A column in a spreadsheet, where every cell is the same kind of thing.","k":"np.array()"},{"g":"Arrays","t":"One type per array","d":"The one type an array holds. One quoted number in the list and numpy turns the whole array into text.","lines":[{"c":"import numpy as np"},{"c":"np.array([11, 9, 6]).dtype","r":"dtype('int64')"},{"c":"str(np.array([11, 9, \"6\"]).dtype)","r":"'<U21'"},{"c":"np.array([11, 9, \"6\"])","r":"array(['11', '9', '6'], dtype='<U21')"}],"like":"One handwritten entry in a numeric column, and the whole column is now text.","k":"dtype"},{"g":"Arrays","t":"Arithmetic on a whole array","d":"An operation applies to every item at once. This is the reason arrays exist.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75])"},{"c":"sales * 2","r":"array([125. ,  82. , 177.5])"},{"c":"sales + 10","r":"array([72.5 , 51.  , 98.75])"}],"like":"Applying the same discount to every row in one stroke."},{"g":"Arrays","t":"Array summaries","d":"Total, average and largest, straight off the array.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75, 95.25, 81.00])"},{"c":"sales.sum()","r":"np.float64(368.5)"},{"c":"round(float(sales.mean()), 2)","r":"73.7"},{"c":"sales.max()","r":"np.float64(95.25)"}],"like":"The summary row at the bottom of the column.","k":".sum()   .mean()   .max()"},{"g":"Arrays","t":"Comparing a whole array","d":"A comparison gives back an array of True and False, one per item.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75])"},{"c":"sales > 60","r":"array([ True, False,  True])"}],"like":"Ticking every row that clears the threshold."},{"g":"Arrays","t":"Filtering with a condition","d":"Put the comparison inside square brackets and you get only the items that passed.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75, 95.25, 81.00])"},{"c":"sales[sales > 60]","r":"array([62.5 , 88.75, 95.25, 81.  ])"},{"c":"len(sales[sales > 60])","r":"4"}],"like":"Pulling out only the rows the filter highlighted.","k":"a[a > 60]"},{"g":"Arrays","t":"Array or list","d":"A list can mix types and grows easily. An array holds one type and does arithmetic on everything at once.","lines":[{"c":"import numpy as np"},{"c":"[1, 2, 3] * 2","r":"[1, 2, 3, 1, 2, 3]"},{"c":"np.array([1, 2, 3]) * 2","r":"array([2, 4, 6])"}],"like":"A notepad versus a spreadsheet column."},{"g":"Arrays","t":"Slicing an array","d":"Same brackets and the same rule: start at a, stop before b.","lines":[{"c":"import numpy as np"},{"c":"sales = np.array([62.50, 41.00, 88.75, 95.25, 81.00])"},{"c":"sales[0:3]","r":"array([62.5 , 41.  , 88.75])"},{"c":"sales[-2:]","r":"array([95.25, 81.  ])"}],"like":"Taking Monday to Wednesday off the week.","k":"[a:b]"},{"g":"Conditionals","t":"The if statement","d":"Runs the indented block only when the condition is True. The colon and the indent are both required.","lines":[{"c":"bags = 26"},{"c":"if bags >= 20:\n    tier = \"Gold\""},{"c":"tier","r":"'Gold'"}],"like":"A rule on the wall: if this, then that.","k":"if"},{"g":"Conditionals","t":"The else branch","d":"What happens when the condition was False. There is nothing to test, so no condition follows it.","lines":[{"c":"bags = 6"},{"c":"if bags >= 20:\n    tier = \"Gold\"\nelse:\n    tier = \"Bronze\""},{"c":"tier","r":"'Bronze'"}],"like":"Otherwise, do this instead.","k":"else"},{"g":"Conditionals","t":"The elif branch","d":"A further test, checked only when everything above it was False. You may have as many as you like.","lines":[{"c":"bags = 14"},{"c":"if bags >= 20:\n    tier = \"Gold\"\nelif bags >= 10:\n    tier = \"Silver\"\nelse:\n    tier = \"Bronze\""},{"c":"tier","r":"'Silver'"}],"like":"The next question on the form, asked only if the last one was no.","k":"elif"},{"g":"Conditionals","t":"Order of the chain","d":"The chain stops at the first test that passes, so the hardest condition has to come first. Put >= 10 above >= 20 and nobody is ever Gold.","lines":[{"c":"bags = 26"},{"c":"if bags >= 10:\n    wrong = \"Silver\"\nelif bags >= 20:\n    wrong = \"Gold\""},{"c":"wrong","r":"'Silver'"},{"c":"if bags >= 20:\n    right = \"Gold\"\nelif bags >= 10:\n    right = \"Silver\""},{"c":"right","r":"'Gold'"}],"like":"Sorting post by narrowest rule first, or everything lands in the first tray."},{"g":"Conditionals","t":"Indentation","d":"The indent is what says which lines belong to the if. Python treats it as part of the grammar, not as decoration.","lines":[{"c":"bags = 26"},{"c":"if bags >= 20:\n    tier = \"Gold\"\n    note = \"counted\""},{"c":"tier","r":"'Gold'"},{"c":"note","r":"'counted'"}],"like":"The bullet points that sit under a heading."},{"g":"Conditionals","t":"Conditions with and / or","d":"Combine tests in one line. Brackets make the intention obvious and cost nothing.","lines":[{"c":"bags = 26"},{"c":"revenue = 368.50"},{"c":"if bags >= 20 and revenue >= 300:\n    tier = \"Gold\""},{"c":"tier","r":"'Gold'"}],"like":"Two boxes that must both be ticked before the discount applies."},{"g":"Conditionals","t":"A condition is just a boolean","d":"Whatever sits after if is evaluated to True or False first. You can print it on its own to see what the if will see.","lines":[{"c":"bags = 26"},{"c":"bags >= 20","r":"True"},{"c":"bags >= 20 and bags < 30","r":"True"}],"like":"Reading the question out loud before you answer it."},{"g":"Errors","t":"TypeError","d":"The operation does not fit the type. Joining text to a number, or asking a number for its length.","lines":[{"c":"\"Total: \" + 368.5","e":"TypeError: can only concatenate str (not \"float\") to str"},{"c":"len(368)","e":"TypeError: object of type 'int' has no len()"}],"like":"Trying to staple water."},{"g":"Errors","t":"ValueError","d":"The type is right but the content is not. float() on a string that has a dollar sign in it.","lines":[{"c":"float(\"$368.50\")","e":"ValueError: could not convert string to float: '$368.50'"},{"c":"int(\"26.0\")","e":"ValueError: invalid literal for int() with base 10: '26.0'"}],"like":"The form is the right form; the box has the wrong thing written in it."},{"g":"Errors","t":"KeyError","d":"You asked a dictionary for a key it does not have. Square brackets demand; .get() asks politely.","lines":[{"c":"price = {\"House\": 12.50}"},{"c":"price[\"Mocha\"]","e":"KeyError: 'Mocha'"},{"c":"price.get(\"Mocha\", 0.0)","r":"0.0"}],"like":"Looking up somebody who left last year."},{"g":"Errors","t":"IndexError","d":"You asked for a position that does not exist. Three items means positions 0, 1 and 2.","lines":[{"c":"blends = [\"House\", \"Sumatra\", \"Decaf\"]"},{"c":"blends[3]","e":"IndexError: list index out of range"},{"c":"blends[2]","r":"'Decaf'"}],"like":"Asking for row 4 of a three-row table."},{"g":"Errors","t":"NameError","d":"You used a name Python has never seen. Usually a typo, or a line that was never run.","lines":[{"c":"revenu","e":"NameError: name 'revenu' is not defined"},{"c":"revenue = 368.50"},{"c":"revenue","r":"368.5"}],"like":"Calling for somebody who does not work here."},{"g":"Errors","t":"AttributeError","d":"You asked for a method the type does not have. Not blocked — never there in the first place.","lines":[{"c":"order = (\"House\", 3)"},{"c":"order.append(1)","e":"AttributeError: 'tuple' object has no attribute 'append'"}],"like":"Looking for a gear stick in a car that has none."},{"g":"Errors","t":"IndentationError","d":"The indent is missing or inconsistent. Python reads indentation as grammar, so it stops.","lines":[{"c":"if 26 >= 20:\nteir = \"Gold\"","e":"IndentationError: expected an indented block after 'if' statement on line 1 (<string>, line 2)"}],"like":"A bullet point that is not under any heading."},{"g":"Errors","t":"Reading a traceback","d":"Read the last line first: it names the error and says what went wrong. The lines above it say where.","lines":[{"c":"int(\"26.0\")","e":"ValueError: invalid literal for int() with base 10: '26.0'"}],"like":"The diagnosis is at the bottom of the report, not the top."}]</script>
+<script>
+const {useState, useEffect, useRef, useMemo, useCallback} = React;
+const DECK = JSON.parse(document.getElementById("deckdata").textContent);
+/* ---------------- verified dashboard truth ----------------
+   Redbud Roasters, week of 1-5 Sep 2026. 8 orders, 26 bags, $368.50.
+   368.50 / 8 = 46.0625 -> $46.06 · daily [62.50,41.00,88.75,95.25,81.00] sums to 368.50
+   counts {House 11, Sumatra 9, Decaf 6} sums to 26 · 3 x 12.50 = 37.50
+   Every error message below was produced by running the line on Python 3.11 / numpy 2.4.4.
+----------------------------------------------------------- */
+const DAYS = [{
+  d: "Mon",
+  v: 62.50
+}, {
+  d: "Tue",
+  v: 41.00
+}, {
+  d: "Wed",
+  v: 88.75
+}, {
+  d: "Thu",
+  v: 95.25
+}, {
+  d: "Fri",
+  v: 81.00
+}];
+const TRUTH = {
+  title: "Redbud Roasters",
+  revenue: "$368.50",
+  bags: "26",
+  avg: "$46.06",
+  best: "House",
+  tier: "Gold",
+  top: "$95.25",
+  restock: "$37.50",
+  mocha: "$0.00",
+  check: "26"
+};
+const ORDER = ["title", "revenue", "bags", "avg", "chart", "best", "tier", "top", "restock", "mocha", "check"];
+const ERRORS = [{
+  id: "revenue",
+  n: 1,
+  tile: "revenue",
+  halts: true,
+  label: "Revenue never arrives",
+  kind: "ValueError",
+  line: 'revenue = float("$368.50")',
+  err: "ValueError: could not convert string to float: '$368.50'",
+  breaks: "The revenue tile never gets a value, and because the script dies here nothing below it is built either — average order, the daily chart, the blend table. One bad conversion takes out three quarters of the page.",
+  why: "The dollar sign is a character, not a number. float() reads digits and one decimal point and nothing else. Money rarely arrives clean: card terminals, spreadsheets and exports all bake the symbol into the text.",
+  fix: "Take the symbol out of the text first, then convert what is left.",
+  accept: ['float("$368.50".replace("$",""))', 'revenue=float("$368.50".replace("$",""))', 'float("368.50")', 'revenue=float("368.50")', 'float("$368.50"[1:])', 'revenue=float("$368.50"[1:])', 'float("$368.50".strip("$"))', 'float("$368.50".lstrip("$"))', 'float("$368.50".replace("$","").replace(",",""))'],
+  show: 'float("$368.50".replace("$", ""))',
+  broken: {}
+}, {
+  id: "bags",
+  n: 2,
+  tile: "bags",
+  halts: true,
+  label: "Bags sold is blank",
+  kind: "ValueError",
+  line: 'bags = int("26.0")',
+  err: "ValueError: invalid literal for int() with base 10: '26.0'",
+  breaks: "The bags tile is empty and everything after it goes dark, including the loyalty tier, which is calculated from the bag count.",
+  why: "int() refuses text containing a decimal point — even a harmless .0. It will not quietly throw away part of somebody's number, because that is exactly the kind of decision a language should not make on its own.",
+  fix: "Read it as a decimal first, then take the whole part deliberately.",
+  accept: ['int(float("26.0"))', 'bags=int(float("26.0"))', 'round(float("26.0"))', 'bags=round(float("26.0"))', 'int(26.0)', 'bags=int(26.0)'],
+  show: 'int(float("26.0"))',
+  broken: {}
+}, {
+  id: "avg",
+  n: 3,
+  tile: "avg",
+  halts: true,
+  label: "Average order crashes on a count",
+  kind: "TypeError",
+  line: 'orders = 8\navg = round(revenue / len(orders), 2)',
+  err: "TypeError: object of type 'int' has no len()",
+  breaks: "The average-order tile dies, and so does everything under it. The chart, the tier badge and the blend table all vanish.",
+  why: "len() asks a container how many things are inside it. 8 is not a container — it is already the answer. Somebody reached for len() out of habit, because that is how you count a list.",
+  fix: "orders is already the count. Divide by it directly.",
+  accept: ['round(revenue/orders,2)', 'avg=round(revenue/orders,2)', 'round(revenue/8,2)', 'avg=round(revenue/8,2)'],
+  show: 'avg = round(revenue / orders, 2)',
+  broken: {}
+}, {
+  id: "best",
+  n: 4,
+  tile: "best",
+  halts: false,
+  label: "Best blend says Decaf",
+  kind: "runs — wrong answer",
+  line: 'counts = {"House": 11, "Sumatra": 9, "Decaf": 6}\nbest = sorted(counts)[0]',
+  err: "",
+  breaks: "Nothing errors. The tile fills in confidently with Decaf — the blend that sold least. Nadia orders more Decaf next week.",
+  why: "sorted() on a dictionary sorts the keys alphabetically, and Decaf comes before House and Sumatra. The counts were never consulted. This is the dangerous kind of bug: it produces a plausible answer, so nobody checks it.",
+  fix: "Ask for the key with the largest count, not the first key in the alphabet.",
+  accept: ['max(counts,key=counts.get)', 'best=max(counts,key=counts.get)', 'sorted(counts,key=counts.get)[-1]', 'best=sorted(counts,key=counts.get)[-1]'],
+  show: 'best = max(counts, key=counts.get)',
+  broken: {
+    best: "Decaf",
+    bestSub: "sold 6"
+  }
+}, {
+  id: "title",
+  n: 5,
+  tile: "title",
+  halts: true,
+  label: "Shop name will not capitalise",
+  kind: "TypeError",
+  line: 'title = "redbud roasters"\ntitle[0] = "R"',
+  err: "TypeError: 'str' object does not support item assignment",
+  breaks: "The whole page fails before it draws anything. The header is built first, so this one line takes the entire dashboard with it.",
+  why: "Once a piece of text exists, its characters are fixed. You can read any character you like; you can overwrite none of them. Every change to text in Python is really a brand-new piece of text.",
+  fix: "Build a new piece of text and put it back under the same name.",
+  accept: ['title=title.title()', 'title.title()', 'title="R"+title[1:]', '"R"+title[1:]', 'title="redbud roasters".title()'],
+  show: 'title = title.title()',
+  broken: {}
+}, {
+  id: "tier",
+  n: 6,
+  tile: "tier",
+  halts: false,
+  label: "Tier says Silver on 26 bags",
+  kind: "runs — wrong answer",
+  line: 'if bags >= 10:\n    tier = "Silver"\nelif bags >= 20:\n    tier = "Gold"\nelse:\n    tier = "Bronze"',
+  err: "",
+  breaks: "No error, no warning. Every customer who should be Gold is quietly filed as Silver — including the ones who spent the most. Nobody finds out until somebody complains.",
+  why: "A chain stops at the first test that passes. 26 is at least 10, so Silver wins and the Gold test is never reached. The elif underneath is unreachable for every number that matters.",
+  fix: "Test the hardest condition first and work down. Type the condition that belongs on the first line.",
+  accept: ['bags>=20', 'if bags>=20:', 'if bags>=20', 'bags >= 20'],
+  show: 'if bags >= 20:   # Gold first, then Silver, then Bronze',
+  broken: {
+    tier: "Silver",
+    tierSub: "should be Gold"
+  }
+}, {
+  id: "top",
+  n: 7,
+  tile: "top",
+  halts: true,
+  label: "Best day crashes on None",
+  kind: "TypeError",
+  line: 'ranked = sales.sort()\ntop = ranked[0]',
+  err: "TypeError: 'NoneType' object is not subscriptable",
+  breaks: "The best-day row crashes and takes restock, Mocha and the checksum with it. Oddly, sales really did get sorted — the work happened, it just was not handed back.",
+  why: ".sort() rearranges the list where it sits and returns nothing at all. What lands in ranked is None, the value Python uses for 'no answer', and None has no positions to index into.",
+  fix: "Use the version that hands back a new sorted list — biggest first.",
+  accept: ['ranked=sorted(sales,reverse=True)', 'sorted(sales,reverse=True)', 'ranked=sorted(sales)[::-1]', 'sorted(sales)[::-1]'],
+  show: 'ranked = sorted(sales, reverse=True)',
+  broken: {}
+}, {
+  id: "restock",
+  n: 8,
+  tile: "restock",
+  halts: false,
+  label: "Restock cost is 15 characters long",
+  kind: "runs — wrong answer",
+  line: 'restock = "12.50" * 3',
+  err: "",
+  breaks: "The row fills with 12.5012.5012.50. Not a crash, and not a number — the price written out three times in a row.",
+  why: "Those quotation marks are the whole story. Multiplying text repeats it; multiplying a number scales it. Somebody wanted $37.50 and got a fifteen-character string no later calculation can use.",
+  fix: "Make the price a number before you multiply it.",
+  accept: ['float("12.50")*3', 'restock=float("12.50")*3', '3*float("12.50")', 'restock=3*float("12.50")'],
+  show: 'restock = float("12.50") * 3',
+  broken: {
+    restock: "12.5012.5012.50"
+  }
+}, {
+  id: "mocha",
+  n: 9,
+  tile: "mocha",
+  halts: true,
+  label: "Mocha row raises a KeyError",
+  kind: "KeyError",
+  line: 'price = {"House": 12.50, "Sumatra": 14.00, "Decaf": 13.00}\nmocha = price["Mocha"]',
+  err: "KeyError: 'Mocha'",
+  breaks: "The blend table stops at Mocha and the bag checksum underneath never runs. Redbud stopped selling Mocha in June; the menu file was never updated.",
+  why: "Square brackets on a dictionary are a demand: this key exists, give it to me. When it does not, Python raises rather than guessing. That is the right behaviour — a missing price silently becoming zero is how invoices go out wrong.",
+  fix: "Ask for it with a stated fallback, so a missing blend is a known zero rather than a stop.",
+  accept: ['price.get("Mocha",0.0)', 'mocha=price.get("Mocha",0.0)', 'price.get("Mocha",0)', 'mocha=price.get("Mocha",0)', 'price.get("Mocha",0.00)'],
+  show: 'mocha = price.get("Mocha", 0.0)',
+  broken: {}
+}, {
+  id: "check",
+  n: 10,
+  tile: "check",
+  halts: true,
+  label: "Bag checksum will not add up",
+  kind: "TypeError",
+  line: 'check = np.array([11, 9, "6"]).sum()',
+  err: "TypeError: the resolved dtypes are not compatible with add.reduce.\nResolved (dtype('<U21'), dtype('<U21'), dtype('<U42'))",
+  breaks: "The checksum row at the bottom is blank, so nobody notices that the blend counts and the bag total have drifted apart.",
+  why: "An array holds one type. One quoted 6 in the list and numpy converts all three to text — look at the dtype, <U21, which means text. Adding text together is not something it will do for you.",
+  fix: "Take the quotation marks off. One stray pair retyped the whole array.",
+  accept: ['np.array([11,9,6]).sum()', 'check=np.array([11,9,6]).sum()'],
+  show: 'check = np.array([11, 9, 6]).sum()',
+  broken: {}
+}];
+const norm = s => (s || "").replace(/[‘’“”']/g, '"').replace(/\s+/g, "").replace(/#.*$/, "");
+
+/* ---------------- segmented control ---------------- */
+function Segmented({
+  items,
+  value,
+  onChange
+}) {
+  const wrap = useRef(null);
+  const [thumb, setThumb] = useState({
+    left: 3,
+    width: 0
+  });
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return;
+    const btn = el.querySelector('[aria-selected="true"]');
+    if (btn) setThumb({
+      left: btn.offsetLeft,
+      width: btn.offsetWidth
+    });
+  }, [value, items]);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "segmented",
+    ref: wrap,
+    role: "tablist"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "thumb",
+    style: {
+      left: thumb.left + "px",
+      width: thumb.width + "px"
+    }
+  }), items.map(it => /*#__PURE__*/React.createElement("button", {
+    key: it.id,
+    role: "tab",
+    "aria-selected": value === it.id,
+    onClick: () => onChange(it.id)
+  }, it.label)));
+}
+
+/* ---------------- dashboard ---------------- */
+function Dashboard({
+  active
+}) {
+  const hitIdx = active ? ORDER.indexOf(active.tile) : -1;
+  const dead = key => {
+    if (!active || !active.halts) return false;
+    return ORDER.indexOf(key) >= hitIdx;
+  };
+  const lie = key => !!active && !active.halts && active.tile === key;
+  const b = active ? active.broken || {} : {};
+  const v = (key, fb) => lie(key) && b[key] !== undefined ? b[key] : fb;
+  const cls = key => (dead(key) ? " dead" : "") + (lie(key) ? " lie" : "");
+  const maxV = Math.max.apply(null, DAYS.map(d => d.v));
+  const Tile = ({
+    k,
+    lab,
+    val,
+    sub
+  }) => /*#__PURE__*/React.createElement("div", {
+    className: "tile" + cls(k)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "lab"
+  }, lab), /*#__PURE__*/React.createElement("div", {
+    className: "val"
+  }, dead(k) ? "—" : val), sub && !dead(k) ? /*#__PURE__*/React.createElement("div", {
+    className: "sub"
+  }, sub) : null);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "screen"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "chrome"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tl"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "tl"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "tl"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "fname" + (active && active.halts ? " bad" : "")
+  }, "weekly_summary.py ", active && active.halts ? "— stopped" : "— finished")), /*#__PURE__*/React.createElement("div", {
+    className: "dash"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dash-h"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shopname" + (dead("title") ? " off" : "")
+  }, dead("title") ? "—" : TRUTH.title), /*#__PURE__*/React.createElement("div", {
+    className: "week"
+  }, "Week of 1–5 September 2026 · 8 orders")), /*#__PURE__*/React.createElement("div", {
+    className: "tiles"
+  }, /*#__PURE__*/React.createElement(Tile, {
+    k: "revenue",
+    lab: "Revenue",
+    val: v("revenue", TRUTH.revenue)
+  }), /*#__PURE__*/React.createElement(Tile, {
+    k: "bags",
+    lab: "Bags sold",
+    val: v("bags", TRUTH.bags)
+  }), /*#__PURE__*/React.createElement(Tile, {
+    k: "avg",
+    lab: "Average order",
+    val: v("avg", TRUTH.avg)
+  }), /*#__PURE__*/React.createElement(Tile, {
+    k: "best",
+    lab: "Best blend",
+    val: v("best", TRUTH.best),
+    sub: lie("best") ? b.bestSub : "sold 11"
+  }), /*#__PURE__*/React.createElement(Tile, {
+    k: "tier",
+    lab: "Loyalty tier",
+    val: v("tier", TRUTH.tier),
+    sub: lie("tier") ? b.tierSub : "20+ bags"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "chartbox" + (dead("chart") ? " dead" : "")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ct"
+  }, "Revenue by day"), /*#__PURE__*/React.createElement("div", {
+    className: "bars"
+  }, DAYS.map(d => /*#__PURE__*/React.createElement("div", {
+    className: "bcol" + (dead("chart") ? " dead" : ""),
+    key: d.d
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "n"
+  }, dead("chart") ? "" : "$" + d.v.toFixed(2)), /*#__PURE__*/React.createElement("div", {
+    className: "b",
+    style: {
+      height: dead("chart") ? "4px" : d.v / maxV * 70 + 6 + "px"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "d"
+  }, d.d))))), /*#__PURE__*/React.createElement("div", {
+    className: "rowbox"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "drow" + cls("top")
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "k"
+  }, "Best day"), /*#__PURE__*/React.createElement("span", {
+    className: "v"
+  }, dead("top") ? "—" : v("top", TRUTH.top) + " (Thu)")), /*#__PURE__*/React.createElement("div", {
+    className: "drow" + cls("restock")
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "k"
+  }, "Restock — 3 bags of House at $12.50"), /*#__PURE__*/React.createElement("span", {
+    className: "v"
+  }, dead("restock") ? "—" : v("restock", TRUTH.restock))), /*#__PURE__*/React.createElement("div", {
+    className: "drow" + cls("mocha")
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "k"
+  }, "Mocha — discontinued June"), /*#__PURE__*/React.createElement("span", {
+    className: "v"
+  }, dead("mocha") ? "—" : v("mocha", TRUTH.mocha))), /*#__PURE__*/React.createElement("div", {
+    className: "drow" + cls("check")
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "k"
+  }, "Checksum — blend counts add to"), /*#__PURE__*/React.createElement("span", {
+    className: "v"
+  }, dead("check") ? "—" : v("check", TRUTH.check) + " bags"))), active && active.halts ? /*#__PURE__*/React.createElement("div", {
+    className: "banner bad",
+    key: active.id
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h"
+  }, "Traceback — the script stopped here"), /*#__PURE__*/React.createElement("pre", null, active.err)) : active ? /*#__PURE__*/React.createElement("div", {
+    className: "banner warn",
+    key: active.id
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h"
+  }, "No error — this one ran to the end"), /*#__PURE__*/React.createElement("pre", null, "Python reported nothing. The page is wrong anyway.")) : /*#__PURE__*/React.createElement("div", {
+    className: "banner ok"
+  }, /*#__PURE__*/React.createElement("p", null, "Everything here agrees with the till receipts. Pick a fault on the left to break it."))));
+}
+
+/* ---------------- tab 1 ---------------- */
+function RepairTab() {
+  const [activeId, setActiveId] = useState(null);
+  const [fixed, setFixed] = useState({});
+  const [draft, setDraft] = useState("");
+  const [verdict, setVerdict] = useState(null);
+  const [tries, setTries] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const inputRef = useRef(null);
+  const selected = ERRORS.find(e => e.id === activeId) || null;
+  const active = selected && !fixed[activeId] ? selected : null;
+  const done = Object.keys(fixed).length;
+  const pick = id => {
+    setActiveId(id);
+    setDraft("");
+    setVerdict(null);
+    setTries(0);
+    setRevealed(false);
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 40);
+  };
+  const run = () => {
+    if (!selected || !norm(draft)) return;
+    const ok = selected.accept.some(a => norm(a) === norm(draft));
+    if (ok) {
+      setFixed(f => ({
+        ...f,
+        [selected.id]: true
+      }));
+      setVerdict("yes");
+    } else {
+      setTries(t => t + 1);
+      setVerdict("no");
+    }
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "masthead"
+  }, /*#__PURE__*/React.createElement("h1", null, "The Repair Shop"), /*#__PURE__*/React.createElement("p", {
+    className: "lede"
+  }, "Nadia's weekly dashboard works. Break one line at a time, watch what it costs her, then type the repair that brings the page back. The second tab is an ", DECK.length, "-card deck covering everything behind it.")), /*#__PURE__*/React.createElement("div", {
+    className: "layout"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-h"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "t"
+  }, "Faults"), /*#__PURE__*/React.createElement("span", {
+    className: "n"
+  }, done, " of 10 repaired")), /*#__PURE__*/React.createElement("ul", {
+    className: "faults"
+  }, ERRORS.map(e => /*#__PURE__*/React.createElement("li", {
+    key: e.id
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "fault" + (fixed[e.id] ? " done" : ""),
+    "aria-pressed": activeId === e.id,
+    onClick: () => pick(e.id)
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "num"
+  }, fixed[e.id] ? "✓" : e.n), /*#__PURE__*/React.createElement("span", {
+    className: "txt"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lab"
+  }, e.label), /*#__PURE__*/React.createElement("span", {
+    className: "kind"
+  }, e.kind))))))), /*#__PURE__*/React.createElement("div", {
+    className: "bar",
+    style: {
+      marginTop: "14px"
+    }
+  }, /*#__PURE__*/React.createElement("i", {
+    style: {
+      width: done * 10 + "%"
+    }
+  })), /*#__PURE__*/React.createElement("p", {
+    className: "hint",
+    style: {
+      marginTop: "12px"
+    }
+  }, "Selecting a fault puts that line back into the script and reruns it. Repair it by typing the corrected line — nothing else brings the page back.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Dashboard, {
+    active: active
+  }), selected ? /*#__PURE__*/React.createElement("div", {
+    className: "explain",
+    key: selected.id
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "srcbox rise"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "l"
+  }, "The line, as the intern left it"), /*#__PURE__*/React.createElement("pre", {
+    className: "code"
+  }, selected.line)), /*#__PURE__*/React.createElement("div", {
+    className: "note breaks rise",
+    style: {
+      animationDelay: ".05s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h"
+  }, "What breaks"), /*#__PURE__*/React.createElement("p", null, selected.breaks)), /*#__PURE__*/React.createElement("div", {
+    className: "note why rise",
+    style: {
+      animationDelay: ".1s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h"
+  }, "Why Python does this"), /*#__PURE__*/React.createElement("p", null, selected.why)), /*#__PURE__*/React.createElement("div", {
+    className: "note fix rise",
+    style: {
+      animationDelay: ".15s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h"
+  }, "How to fix it"), /*#__PURE__*/React.createElement("p", null, selected.fix)), /*#__PURE__*/React.createElement("div", {
+    className: "repair rise",
+    style: {
+      animationDelay: ".2s"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "l",
+    htmlFor: "fixin"
+  }, "Type the repaired line"), /*#__PURE__*/React.createElement("div", {
+    className: "inrow"
+  }, /*#__PURE__*/React.createElement("input", {
+    id: "fixin",
+    className: "mono-in",
+    type: "text",
+    ref: inputRef,
+    value: draft,
+    spellCheck: "false",
+    autoComplete: "off",
+    autoCapitalize: "off",
+    placeholder: fixed[selected.id] ? "repaired" : "your fix here",
+    disabled: !!fixed[selected.id],
+    onChange: e => {
+      setDraft(e.target.value);
+      setVerdict(null);
+    },
+    onKeyDown: e => {
+      if (e.key === "Enter") run();
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: run,
+    disabled: !!fixed[selected.id]
+  }, "Run it"), /*#__PURE__*/React.createElement("button", {
+    className: "btn sub",
+    onClick: () => setRevealed(true),
+    disabled: revealed || !!fixed[selected.id]
+  }, "Show me")), verdict === "yes" ? /*#__PURE__*/React.createElement("div", {
+    className: "verdict yes"
+  }, "Repaired. The dashboard is back — look at the tile that was broken.") : verdict === "no" ? /*#__PURE__*/React.createElement("div", {
+    className: "verdict no"
+  }, "Not yet. ", tries >= 2 ? "Read the fix note again, or press Show me." : "Look at what the line asks Python to do to the wrong kind of thing.") : null, revealed && !fixed[selected.id] ? /*#__PURE__*/React.createElement("div", {
+    className: "showme"
+  }, "One accepted answer: ", /*#__PURE__*/React.createElement("code", null, selected.show), " — now type it.") : null, fixed[selected.id] ? /*#__PURE__*/React.createElement("div", {
+    className: "showme"
+  }, "Accepted: ", /*#__PURE__*/React.createElement("code", null, selected.show)) : null)) : /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginTop: "24px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "blank"
+  }, "Pick a fault from the list to see what it costs.")))));
+}
+
+/* ---------------- tab 2: flashcards ---------------- */
+const GROUPS = (() => {
+  const seen = [];
+  DECK.forEach(c => {
+    if (seen.indexOf(c.g) === -1) seen.push(c.g);
+  });
+  return seen;
+})();
+function CodeBlock({
+  lines
+}) {
+  return /*#__PURE__*/React.createElement("pre", {
+    className: "code"
+  }, lines.map((l, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: i
+  }, i ? "\n" : null, l.c, l.r ? /*#__PURE__*/React.createElement("span", {
+    className: "res"
+  }, "   → " + l.r) : null, l.e ? /*#__PURE__*/React.createElement("span", {
+    className: "errline"
+  }, "\n" + l.e) : null)));
+}
+function CardsTab() {
+  const [group, setGroup] = useState("All");
+  const [pile, setPile] = useState([]);
+  const [pos, setPos] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [leaving, setLeaving] = useState(null);
+  const [from, setFrom] = useState("right");
+  const busy = useRef(false);
+  const touch = useRef({
+    x: 0,
+    y: 0,
+    swiped: false
+  });
+  const inGroup = useMemo(() => DECK.map((c, i) => i).filter(i => group === "All" || DECK[i].g === group), [group]);
+  useEffect(() => {
+    setPile(inGroup);
+    setPos(0);
+    setFlipped(false);
+  }, [inGroup]);
+  const card = pile.length ? DECK[pile[pos % pile.length]] : null;
+  const go = useCallback(dir => {
+    if (busy.current || pile.length < 2) return;
+    busy.current = true;
+    setLeaving(dir);
+    setTimeout(() => {
+      setPos(p => dir === "next" ? (p + 1) % pile.length : (p - 1 + pile.length) % pile.length);
+      setFrom(dir === "next" ? "right" : "left");
+      setFlipped(false);
+      setLeaving(null);
+      busy.current = false;
+    }, 340);
+  }, [pile]);
+  const shuffle = () => {
+    const a = pile.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    setPile(a);
+    setPos(0);
+    setFlipped(false);
+  };
+  const restart = () => {
+    setPile(inGroup);
+    setPos(0);
+    setFlipped(false);
+  };
+  useEffect(() => {
+    const onKey = e => {
+      if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        setFlipped(f => !f);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go("next");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go("prev");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [go]);
+  const total = pile.length;
+  const C = 2 * Math.PI * 26;
+  const pct = total ? (pos + 1) / total : 0;
+  const Prev = /*#__PURE__*/React.createElement("button", {
+    className: "arrow",
+    onClick: () => go("prev"),
+    disabled: total < 2,
+    "aria-label": "Previous card"
+  }, "‹");
+  const Next = /*#__PURE__*/React.createElement("button", {
+    className: "arrow",
+    onClick: () => go("next"),
+    disabled: total < 2,
+    "aria-label": "Next card"
+  }, "›");
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "chips"
+  }, ["All"].concat(GROUPS).map(g => /*#__PURE__*/React.createElement("button", {
+    key: g,
+    className: "chip",
+    "aria-pressed": group === g,
+    onClick: () => setGroup(g)
+  }, g, g === "All" ? " " + DECK.length : ""))), /*#__PURE__*/React.createElement("div", {
+    className: "deckwrap"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "deckrow"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "arrowbar deskonly"
+  }, Prev), /*#__PURE__*/React.createElement("div", {
+    className: "stage"
+  }, pile.length > 1 ? /*#__PURE__*/React.createElement("div", {
+    className: "stack s1"
+  }) : null, pile.length > 2 ? /*#__PURE__*/React.createElement("div", {
+    className: "stack s2"
+  }) : null, card ? /*#__PURE__*/React.createElement("div", {
+    className: "swap " + (leaving === "next" ? "leaveL" : leaving === "prev" ? "leaveR" : from === "left" ? "enterL" : "enter"),
+    key: card.t + "-" + pos
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flip" + (flipped ? " on" : ""),
+    onPointerDown: e => {
+      touch.current = {
+        x: e.clientX,
+        y: e.clientY,
+        swiped: false
+      };
+    },
+    onPointerUp: e => {
+      const dx = e.clientX - touch.current.x;
+      const dy = e.clientY - touch.current.y;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
+        touch.current.swiped = true;
+        go(dx < 0 ? "next" : "prev");
+      }
+    },
+    onClick: () => {
+      if (!leaving && !touch.current.swiped) setFlipped(f => !f);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "face front"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grp"
+  }, card.g), /*#__PURE__*/React.createElement("div", {
+    className: "term"
+  }, card.t), card.k ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "badge"
+  }, card.k)) : null, /*#__PURE__*/React.createElement("div", {
+    className: "tap"
+  }, "Tap the card, or press space, to turn it over")), /*#__PURE__*/React.createElement("div", {
+    className: "face back"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grp"
+  }, card.g), /*#__PURE__*/React.createElement("div", {
+    className: "term",
+    style: {
+      marginTop: "4px"
+    }
+  }, card.t), card.k ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "badge"
+  }, card.k)) : null, /*#__PURE__*/React.createElement("p", {
+    className: "defn"
+  }, card.d), /*#__PURE__*/React.createElement(CodeBlock, {
+    lines: card.lines
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "like"
+  }, /*#__PURE__*/React.createElement("b", null, "Think of it as"), " — ", card.like)))) : null), /*#__PURE__*/React.createElement("div", {
+    className: "arrowbar deskonly"
+  }, Next)), /*#__PURE__*/React.createElement("div", {
+    className: "deckctrl mobonly"
+  }, Prev, Next), /*#__PURE__*/React.createElement("div", {
+    className: "keyhint",
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "kbd"
+  }, "space"), " turn over · ", /*#__PURE__*/React.createElement("span", {
+    className: "kbd"
+  }, "←"), " previous ·", /*#__PURE__*/React.createElement("span", {
+    className: "kbd"
+  }, "→"), " next · swipe the card on a phone")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-h"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "t"
+  }, "Progress")), /*#__PURE__*/React.createElement("div", {
+    className: "card-b",
+    style: {
+      display: "grid",
+      gap: "16px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ringwrap"
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "ring",
+    width: "64",
+    height: "64",
+    viewBox: "0 0 64 64"
+  }, /*#__PURE__*/React.createElement("circle", {
+    className: "track",
+    cx: "32",
+    cy: "32",
+    r: "26"
+  }), /*#__PURE__*/React.createElement("circle", {
+    className: "fill",
+    cx: "32",
+    cy: "32",
+    r: "26",
+    strokeDasharray: C,
+    strokeDashoffset: C * (1 - pct)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "ringnum"
+  }, total ? pos + 1 : 0, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "var(--text-3)",
+      fontWeight: 500
+    }
+  }, "/", total)), /*#__PURE__*/React.createElement("div", {
+    className: "ringsub"
+  }, group === "All" ? "the whole deck" : group))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn sub sm",
+    onClick: shuffle,
+    disabled: total < 2
+  }, "Shuffle"), /*#__PURE__*/React.createElement("button", {
+    className: "btn sub sm",
+    onClick: restart
+  }, "Back to the start")), /*#__PURE__*/React.createElement("p", {
+    className: "hint"
+  }, "Pick a topic above to work through one group at a time, or shuffle the whole deck."))))));
+}
+
+/* ---------------- shell ---------------- */
+function App() {
+  const [tab, setTab] = useState("repair");
+  const [theme, setTheme] = useState(null);
+  const flip = () => {
+    const cur = theme || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nx = cur === "dark" ? "light" : "dark";
+    setTheme(nx);
+    document.documentElement.setAttribute("data-theme", nx);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topline"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "seg-wrap"
+  }, /*#__PURE__*/React.createElement(Segmented, {
+    value: tab,
+    onChange: setTab,
+    items: [{
+      id: "repair",
+      label: "Fix the dashboard"
+    }, {
+      id: "cards",
+      label: "Flashcards"
+    }]
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "ghostpill",
+    onClick: flip
+  }, "Light / dark")), /*#__PURE__*/React.createElement("div", {
+    className: "tabbody"
+  }, tab === "repair" ? /*#__PURE__*/React.createElement(RepairTab, null) : /*#__PURE__*/React.createElement(CardsTab, null)));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));</script>
+</body>
+</html>
