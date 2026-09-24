@@ -1550,7 +1550,7 @@ function initViz() {
     const names = Object.keys(st.vars);
     const body = names.map(k => {
       const changed = !prev || !prev.vars[k] || prev.vars[k].v !== st.vars[k].v;
-      return "<tr class='" + (changed && prev ? "changed" : "") + "'><td class='vz-name'>" + esc(k) + "</td><td class='vz-val'>" + esc(st.vars[k].v) + "</td><td class='vz-type'>" + esc(st.vars[k].t) + "</td></tr>";
+      return "<tr class='" + (changed && prev ? "vz-changed" : "") + "'><td class='vz-name'>" + esc(k) + "</td><td class='vz-val'>" + esc(st.vars[k].v) + "</td><td class='vz-type'>" + esc(st.vars[k].t) + "</td></tr>";
     }).join("");
     $("vz-varbody").innerHTML = body;
     $("vz-varempty").hidden = names.length > 0;
@@ -1673,7 +1673,7 @@ function initViz() {
     const total = STEPS.filter(s => s.line === header).length;
     const done = STEPS.slice(0, pos + 1).filter(s => s.line === header).length;
     let html = "<span class='vz-pass' style='border:0;padding-left:0'>loop on line " + header + ":</span>";
-    for (let p = 1; p < total; p++) html += "<span class='pass" + (p === done ? " on" : "") + "'>" + p + "</span>";
+    for (let p = 1; p < total; p++) html += "<span class='vz-pass" + (p === done ? " vz-on" : "") + "'>" + p + "</span>";
     box.innerHTML = html;
   }
 
